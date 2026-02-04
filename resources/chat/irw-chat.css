@@ -171,13 +171,17 @@
 }
 .irw-chat-msg.assistant .irw-chat-h3 { font-size: 0.95em; }
 .irw-chat-msg.assistant .irw-chat-list {
-  margin: 4px 0;
-  padding-left: 2em;
-  list-style-position: outside;
+  margin: 2px 0;
+  padding-left: 1.5em;
+  list-style-position: inside;
+}
+.irw-chat-msg.assistant .irw-chat-list + .irw-chat-list {
+  margin-top: 0;
 }
 .irw-chat-msg.assistant .irw-chat-list li {
   margin: 0 0 2px 0;
   padding: 0;
+  padding-left: 0.25em;
   line-height: 1.4;
 }
 .irw-chat-msg.assistant .irw-chat-list li:last-child {
