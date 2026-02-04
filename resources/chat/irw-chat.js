@@ -49,12 +49,15 @@
     // Bold and inline code
     rest = rest.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
     rest = rest.replace(/`([^`]+)`/g, "<code class=\"irw-chat-inline-code\">$1</code>");
-    // Numbered and bullet lists: process line-by-line. Skip empty lines so we don't close/reopen lists and create huge gaps.
-    // Lines that don't start a new list item but follow a list item are treated as continuation of that item (same <li>).
+    // Numbered line "N. title" = standalone header (no bullet, no list indent). Bullets = <ul><li>.
+    // Only treat a line as continuation of a list item when it doesn't look like a new paragraph.
     var lines = rest.split("\n");
     var out = [];
-    var inOl = false;
     var inUl = false;
+    var looksLikeNewParagraph = function (s) {
+      var t = s.trim();
+      return !t || /^(For |See |To |You |We |I |Note |Click |If you |\[|Alternatively|Finally|In summary|R code|Code to|```)/i.test(t);
+    };
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
       if (line.trim() === "") {
@@ -63,16 +66,13 @@
       var numMatch = line.match(/^(\d+)\.\s+(.+)$/);
       var bulletMatch = line.match(/^\s*[-*]\s+(.+)$/);
       if (numMatch) {
-        if (!inOl) { out.push("<ol class=\"irw-chat-list\">"); inOl = true; }
         if (inUl) { out.push("</ul>"); inUl = false; }
-        out.push("<li>" + numMatch[2] + "</li>");
+        out.push("<div class=\"irw-chat-list-title\">" + numMatch[1] + ". " + numMatch[2] + "</div>");
       } else if (bulletMatch) {
-        if (inOl) { out.push("</ol>"); inOl = false; }
         if (!inUl) { out.push("<ul class=\"irw-chat-list\">"); inUl = true; }
         out.push("<li>" + bulletMatch[1] + "</li>");
       } else {
-        // Continuation of previous list item: append to last <li> so it stays indented
-        if (inOl || inUl) {
+        if (inUl && !looksLikeNewParagraph(line)) {
           var j = out.length - 1;
           while (j >= 0 && out[j].indexOf("<li>") !== 0) j--;
           if (j >= 0) {
@@ -80,28 +80,22 @@
             continue;
           }
         }
-        if (inOl) { out.push("</ol>"); inOl = false; }
         if (inUl) { out.push("</ul>"); inUl = false; }
         out.push(line);
       }
     }
-    if (inOl) out.push("</ol>");
     if (inUl) out.push("</ul>");
     rest = out.join("\n");
     rest = rest.replace(/\n{2,}/g, "\n").replace(/\n/g, "<br>");
     // Remove <br> between list elements so list items don't get double spacing
     rest = rest.replace(/(<\/li>)(<br>)+(<li>)/gi, "$1$3");
-    rest = rest.replace(/(<\/li>)(<br>)+(<\/ol>)/gi, "$1$3");
     rest = rest.replace(/(<\/li>)(<br>)+(<\/ul>)/gi, "$1$3");
-    rest = rest.replace(/(<ol[^>]*>)(<br>)+(<li>)/gi, "$1$3");
     rest = rest.replace(/(<ul[^>]*>)(<br>)+(<li>)/gi, "$1$3");
-    rest = rest.replace(/(<\/ol>)(<br>)+(<ul[^>]*>)/gi, "$1$3");
-    rest = rest.replace(/(<\/ul>)(<br>)+(<ol[^>]*>)/gi, "$1$3");
-    // Collapse extra <br> before/after lists: at most one line break before first list, none after list end
-    rest = rest.replace(/(<br>){2,}(<ol[^>]*>)/gi, "<br>$2");
+    // Collapse extra <br> before/after list or title: at most one line break before, none after
     rest = rest.replace(/(<br>){2,}(<ul[^>]*>)/gi, "<br>$2");
-    rest = rest.replace(/(<\/ol>)(<br>)+/gi, "$1");
+    rest = rest.replace(/(<br>){2,}(<div class="irw-chat-list-title">)/gi, "<br>$2");
     rest = rest.replace(/(<\/ul>)(<br>)+/gi, "$1");
+    rest = rest.replace(/(<\/div>)(<br>)+/gi, "$1");
     // Restore code blocks
     for (var j = 0; j < codeBlocks.length; j++) {
       rest = rest.replace("___CODE" + j + "___", codeBlocks[j]);

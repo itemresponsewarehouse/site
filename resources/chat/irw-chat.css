@@ -170,20 +170,20 @@
   margin-top: 0;
 }
 .irw-chat-msg.assistant .irw-chat-h3 { font-size: 0.95em; }
+/* Numbered title (e.g. "1. dataset_name"): no bullet, no list indent, stands out as header */
+.irw-chat-msg.assistant .irw-chat-list-title {
+  margin: 6px 0 2px 0;
+  padding: 0;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.irw-chat-msg.assistant .irw-chat-list-title:first-child {
+  margin-top: 0;
+}
 .irw-chat-msg.assistant .irw-chat-list {
   margin: 2px 0;
-  list-style-position: inside;
-}
-/* Numbered list (title): align with body text, no extra indent */
-.irw-chat-msg.assistant ol.irw-chat-list {
-  padding-left: 0;
-}
-/* Bullet list: indent so bullets don't overlap border */
-.irw-chat-msg.assistant ul.irw-chat-list {
   padding-left: 1.5em;
-}
-.irw-chat-msg.assistant .irw-chat-list + .irw-chat-list {
-  margin-top: 0;
+  list-style-position: inside;
 }
 .irw-chat-msg.assistant .irw-chat-list li {
   margin: 0 0 2px 0;
