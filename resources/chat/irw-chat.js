@@ -67,8 +67,8 @@
         if (inUl) { out.push("</ul>"); inUl = false; }
         out.push("<li>" + numMatch[2] + "</li>");
       } else if (bulletMatch) {
-        if (!inUl) { out.push("<ul class=\"irw-chat-list\">"); inUl = true; }
         if (inOl) { out.push("</ol>"); inOl = false; }
+        if (!inUl) { out.push("<ul class=\"irw-chat-list\">"); inUl = true; }
         out.push("<li>" + bulletMatch[1] + "</li>");
       } else {
         // Continuation of previous list item: append to last <li> so it stays indented
@@ -97,6 +97,11 @@
     rest = rest.replace(/(<ul[^>]*>)(<br>)+(<li>)/gi, "$1$3");
     rest = rest.replace(/(<\/ol>)(<br>)+(<ul[^>]*>)/gi, "$1$3");
     rest = rest.replace(/(<\/ul>)(<br>)+(<ol[^>]*>)/gi, "$1$3");
+    // Collapse extra <br> before/after lists: at most one line break before first list, none after list end
+    rest = rest.replace(/(<br>){2,}(<ol[^>]*>)/gi, "<br>$2");
+    rest = rest.replace(/(<br>){2,}(<ul[^>]*>)/gi, "<br>$2");
+    rest = rest.replace(/(<\/ol>)(<br>)+/gi, "$1");
+    rest = rest.replace(/(<\/ul>)(<br>)+/gi, "$1");
     // Restore code blocks
     for (var j = 0; j < codeBlocks.length; j++) {
       rest = rest.replace("___CODE" + j + "___", codeBlocks[j]);
