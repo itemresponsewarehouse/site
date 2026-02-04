@@ -1,6 +1,6 @@
 /**
  * js for IRW Chat widget: agentic assistant to locate and process IRW data.
- * Configure API URL via window.IRW_CHAT_API_URL (default /api/chat for same-origin).
+ * Configure API URL via window.IRW_CHAT_API_URL (default /api/chat for same-origin). (not perfect but works pretty well for now)
  */
 (function () {
   "use strict";
